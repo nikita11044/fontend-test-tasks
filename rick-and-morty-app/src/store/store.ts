@@ -1,11 +1,17 @@
 import { configureStore } from '@reduxjs/toolkit';
-
-const root = (state: any) => state;
+import { setupListeners } from '@reduxjs/toolkit/query';
+import { charactersApi } from './api/characters';
 
 const store = configureStore({
   reducer: {
-    root,
+    [charactersApi.reducerPath]: charactersApi.reducer,
   },
+  middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(charactersApi.middleware),
 });
+
+setupListeners(store.dispatch);
+
+export type RootState = ReturnType<typeof store.getState>;
+export type AppDispatch = typeof store.dispatch;
 
 export default store;
