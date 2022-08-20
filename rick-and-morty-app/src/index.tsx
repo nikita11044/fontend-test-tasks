@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom/client';
 import './index.css';
 import { Provider } from 'react-redux';
 import { BrowserRouter } from 'react-router-dom';
+import { CssBaseline } from '@mui/material';
 import reportWebVitals from './reportWebVitals';
 import { store } from './store';
 import App from './App';
@@ -12,6 +13,7 @@ const root = ReactDOM.createRoot(
 );
 root.render(
   <React.StrictMode>
+    <CssBaseline />
     <Provider store={store}>
       <BrowserRouter>
         <App />
