@@ -1,12 +1,23 @@
-import React from 'react';
-import { CircularProgress } from '@mui/material';
+import React, { useEffect } from 'react';
+import { CircularProgress, Pagination } from '@mui/material';
 import Typography from '@mui/material/Typography';
 import { useGetAllCharactersQuery } from '../../store/api/characters';
 import Character from '../../components/Character/Character';
 import styles from './Home.module.scss';
+import { useAppDispatch, useAppSelector } from '../../store/hooks';
+import { setPage } from '../../store/slices/app';
 
 const Home: React.FC = () => {
-  const { data, error, isLoading } = useGetAllCharactersQuery();
+  const dispatch = useAppDispatch();
+  const filter = useAppSelector((state) => state.filter);
+
+  const {
+    data, error, isLoading, refetch,
+  } = useGetAllCharactersQuery();
+
+  useEffect(() => {
+    refetch();
+  }, [filter]);
 
   if (isLoading) {
     return <CircularProgress />;
@@ -22,14 +33,33 @@ const Home: React.FC = () => {
     return <Typography variant="h4">No characters found</Typography>;
   }
 
+  const handlePageChange = (_: unknown, page: number) => {
+    dispatch(setPage(page));
+  };
+
   return (
-    <div className={styles.charactersGrid}>
-      {data.map(({
-        id, name, image, status,
-      }) => (
-        <Character id={id} name={name} image={image} status={status} />
-      ))}
-    </div>
+    <>
+      <Pagination
+        count={data.info.count}
+        onChange={handlePageChange}
+        variant="outlined"
+        color="primary"
+        size="large"
+      />
+      <div className={styles.charactersGrid}>
+        {data.results.map(({
+          id, name, image, status,
+        }) => (
+          <Character
+            key={id}
+            id={id}
+            name={name}
+            image={image}
+            status={status}
+          />
+        ))}
+      </div>
+    </>
   );
 };
 

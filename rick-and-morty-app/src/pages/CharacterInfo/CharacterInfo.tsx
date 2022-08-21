@@ -1,18 +1,21 @@
 import React from 'react';
 import { CircularProgress } from '@mui/material';
 import Typography from '@mui/material/Typography';
+import { Navigate, useParams } from 'react-router-dom';
 import { useGetCharacterByIdQuery } from '../../store/api/characters';
-import styles from './Character.module.scss';
+import styles from './CharacterInfo.module.scss';
+import { Locations } from '../../components';
 
 const CharacterInfo: React.FC = () => {
-  const { data, error, isLoading } = useGetCharacterByIdQuery(1);
+  const { id } = useParams();
+  const { data, error, isLoading } = useGetCharacterByIdQuery(Number(id) || 0);
 
   if (isLoading) {
     return <CircularProgress />;
   }
 
   if (error) {
-    return <Typography variant="h4">Error while fetching character</Typography>;
+    return <Navigate to="/" replace />;
   }
 
   if (!data) {
@@ -20,37 +23,40 @@ const CharacterInfo: React.FC = () => {
   }
 
   const {
-    name, image, status, species, gender,
+    name, image, status, species, gender, location,
   } = data;
 
   return (
-    <div>
+    <div className={styles.root}>
       <div className={styles.image}>
         <img src={image} alt={name} />
       </div>
-      <div className={styles.info}>
-        <Typography variant="h3">{name}</Typography>
-        <ul>
+      <div>
+        <Typography variant="h3">
+          {name.length > 20 ? `${name.substring(0, 20)}...` : name}
+        </Typography>
+        <ul className={styles.info}>
           <li>
             <Typography variant="body2">
-              Status:
+              Status:&nbsp;
               {status}
             </Typography>
           </li>
           <li>
             <Typography variant="body2">
-              Species:
+              Species:&nbsp;
               {species}
             </Typography>
           </li>
           <li>
             <Typography variant="body2">
-              Gender:
+              Gender:&nbsp;
               {gender}
             </Typography>
           </li>
         </ul>
         <Typography variant="h4">Featured in episodes:</Typography>
+        <Locations ids={Number(location.url.split('/').pop())} />
       </div>
     </div>
   );
